@@ -1,0 +1,22 @@
+stateDiagram-v2
+    direction LR
+
+    state "Ожидает рассмотрения (pending)" as pending
+    state "Принят (approved)" as approved
+    state "Отклонён (rejected)" as rejected
+
+    [*] --> pending : запрос на блокировку (менеджер арендатора)
+    pending --> approved : подтвердить (админ БЦ) / пропуск переходит активен -> заблокирован
+    pending --> rejected : отклонить (админ БЦ)
+    approved --> [*]
+    rejected --> [*]
+
+    note right of pending
+        Пока запрос не подтверждён, пропуск остаётся "активен",
+        и охрана продолжает его пропускать.
+    end note
+
+    note right of rejected
+        Пропуск не меняется; менеджер получает уведомление.
+        Повторный запрос — новая сущность.
+    end note
